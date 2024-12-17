@@ -82,7 +82,7 @@ jobs:
           IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
                 --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
-                --header 'accept: application/json' | jq '.[].status_str')"
+                --header 'accept: application/json' | jq '.[].status_str')
 
           echo "ℹ️ Current Status: $IMAGE_STATUS"
               if [[ "$IMAGE_STATUS" == "Quarantined" ]]; then
