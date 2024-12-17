@@ -16,8 +16,8 @@ permissions:
 
 env:
   REGISTRY: docker.cloudsmith.io
-  IMAGE_NAME: gh-actions/example-app/flask_app 
-  CLOUDSMITH_REPO_NAME: demo/example-app 
+  IMAGE_NAME: demo/gh-actions/flask_app 
+  CLOUDSMITH_REPO_NAME: gh-actions/flask-app 
   CLOUDSMITH_SERVICE: gh-actions
   CLOUDSMITH_NAMESPACE: demo
 
