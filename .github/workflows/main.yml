@@ -65,11 +65,10 @@ jobs:
         id: get-slug
         run: | 
           sleep 20
-          echo "IMAGE_STATUS=$(curl -s -G \
-                --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
+          echo "IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
                 --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
-                --header 'accept: application/json' | jq '.[].status_str')" >> $GITHUB_ENV
+                --header 'accept: application/json' | jq '.[].status_str')" >> "$GITHUB_ENV"
 
       - name: Check Image status 
         id: check-status
