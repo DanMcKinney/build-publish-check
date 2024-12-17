@@ -60,12 +60,10 @@ jobs:
         id: get-digest
         run: |
           echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest | sed 's/^.*@//')" >> $GITHUB_ENV
-          echo "IMAGE_DIGEST2=$(docker inspect --format='{{index .Id}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
 
       - name: Get Image Status
         id: get-slug
         run: | 
-          sleep 20
           echo "IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
                 --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
@@ -75,5 +73,7 @@ jobs:
         id: check-status
         run: | 
           echo "Image Digest is ${{ env.IMAGE_DIGEST }}"
-          echo "Image Digest2 is ${{ env.IMAGE_DIGEST2 }}"
-          echo "Image status is ${{ env.IMAGE_STATUS }}"
+          if 
+            ${{ env.IMAGE_STATUS }}"=="Quarantined"
+            exit 1
+          fi  
