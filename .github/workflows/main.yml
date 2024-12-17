@@ -66,7 +66,7 @@ jobs:
       - name: Get Image slug/identifier
         run: | 
           SLUG=$(curl --request GET \
-                --url "https://api.cloudsmith.io/v1/packages/$CLOUDSMITH_NAMESPACE/gh-actions/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
+                --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/gh-actions/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
                 --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
                 --header 'accept: application/json') | jq '.slug_perm' >> $GITHUB_ENV
 
