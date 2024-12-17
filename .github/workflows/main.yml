@@ -61,13 +61,13 @@ jobs:
         run: |
           echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest | sed 's/^.*@//')" >> $GITHUB_ENV
 
-      - name: Get Image Status
-        id: get-slug
-        run: | 
-          echo "IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
-                --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
-                --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
-                --header 'accept: application/json' | jq '.[].status_str')" >> $GITHUB_ENV
+    #  - name: Get Image Status
+    #   id: get-slug
+    #    run: | 
+    #      echo "IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
+    #            --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
+    #            --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
+    #            --header 'accept: application/json' | jq '.[].status_str')" >> $GITHUB_ENV
 
       - name: Check Image status 
         id: check-status
@@ -79,12 +79,16 @@ jobs:
           
           for ((i=1; i<=MAX_RETRIES; i++)); do
           echo "🔄 Attempt $i of $MAX_RETRIES..."
+          IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
+                --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
+                --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
+                --header 'accept: application/json' | jq '.[].status_str')"
 
-          echo "ℹ️ Current Status: ${{ env.IMAGE_STATUS }}"
-              if [[ ${{ env.IMAGE_STATUS }} == "Quarantined" ]]; then
+          echo "ℹ️ Current Status: $IMAGE_STATUS"
+              if [[ $IMAGE_STATUS == "Quarantined" ]]; then
               echo "🚨 Image ${{ env.IMAGE_DIGEST }}  is quarantined. Build failed."
               exit 1
-          fi
+              fi
 
           echo "⏳ Waiting $SLEEP_TIME seconds before retrying..."
           sleep $SLEEP_TIME
