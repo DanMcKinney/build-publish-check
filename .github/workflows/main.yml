@@ -64,7 +64,7 @@ jobs:
       - name: Get Image Status
         id: get-slug
         run: | 
-          echo "IMAGE_STATUS=$(curl --request GET \
+          echo "IMAGE_STATUS=$(curl -s -G \
                 --url https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/ \
                 --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
