@@ -60,11 +60,10 @@ jobs:
       - name: Get image digest
         id: get-digest
         run: |
-          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}):latest" >> $GITHUB_ENV
-          echo $GITHUB_ENV 
-          echo "Image digest is ${{ env.IMAGE_DIGEST }}"
+          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
+          echo "Image digest is $IMAGE_DIGEST"
 
-      - name: Get Image slug/identifier
+      - name: Get Image Slug/Identifier
         id: get-slug
         run: | 
           SLUG=$(curl --request GET \
