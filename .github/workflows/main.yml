@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: build-publish-check
 
 on:
   push: 
@@ -16,8 +16,10 @@ permissions:
 
 env:
   REGISTRY: docker.cloudsmith.io
-  IMAGE_NAME: ciara-demo/sbom-support/flask_app # OSS_DEMO_INPUTS: Update to {org_name}/{repo_name}/flask_app
-  CLOUDSMITH_REPO_NAME: ciara-demo/sbom-support # OSS_DEMO_INPUTS: Update to {org_name}/{repo_name}
+  IMAGE_NAME: gh-actions/example-app/flask_app 
+  CLOUDSMITH_REPO_NAME: demo/example-app 
+  CLOUDSMITH_SERVICE: gh-actions
+  CLOUDSMITH_NAMESPACE: demo
 
 jobs:
   build:
@@ -27,18 +29,21 @@ jobs:
       # Step to checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Step to install cosign
-      - name: Install cosign
-        uses: sigstore/cosign-installer@v3.5.0
+      
+      - name: Auth to Cloudsmith with OIDC
+        uses: cloudsmith-io/cloudsmith-cli-action@v1.0.2
+        with:
+          oidc-namespace: ${{ env.CLOUDSMITH_NAMESPACE}}
+          oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE }}
+          oidc-auth-only: 'true'
 
       # Step to authenticate with Cloudsmith Docker Registry
       - name: Authenticate with Cloudsmith Docker Registry
         uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ secrets.CLOUDSMITH_USER_NAME }}
-          password: ${{ secrets.CLOUDSMITH_API_KEY }}
+          username: ${{ env.CLOUDSMITH_SERVICE }}
+          password: ${{ env.CLOUDSMITH_API_KEY }}
 
       # Step to build and push the Docker image to Cloudsmith
       - name: Build and push image
@@ -49,7 +54,6 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
-            CLOUDSMITH_ENTITLEMENT_TOKEN=${{ secrets.CLOUDSMITH_ENTITLEMENT_TOKEN }}
             CLOUDSMITH_REPO_NAME=${{ env.CLOUDSMITH_REPO_NAME }}
             
       # Step to get the image digest
@@ -57,20 +61,22 @@ jobs:
         id: get-digest
         run: |
           echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
+          echo "Image digest is $IMAGE_DIGEST"
 
-      # Step to generate the SBOM (Software Bill of Materials)
-      - name: Generate SBOM
-        uses: anchore/sbom-action@v0
-        id: sbom
-        with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          format: spdx-json
-          output-file: 'sbom.spdx.json'
+      - name: Get Image slug/identifier
+        run: | 
+          SLUG=$(curl --request GET \
+                --url "https://api.cloudsmith.io/v1/packages/$CLOUDSMITH_NAMESPACE/gh-actions/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
+                --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
+                --header 'accept: application/json') | jq '.slug_perm' >> $GITHUB_ENV
 
-      # Step to publish the SBOM as an attestation
-      - name: Publish SBOM
-        run: cosign attest --yes --predicate sbom.spdx.json ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          echo "Package identifier is $SLUG"
 
-      # Step to sign the Docker image with GitHub OIDC Token
-      - name: Sign the images with GitHub OIDC Token
-        run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+      - name: Check package status 
+        run: | 
+          STATUS=$(curl --request GET \
+          --url "https://api.cloudsmith.io/v1/packages/demo/gh-actions/${{env.SLUG}}/status/" \
+          --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
+          --header 'accept: application/json') | jq '.status_str'
+
+          echo "Packge status is $STATUS"
