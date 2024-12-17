@@ -82,4 +82,5 @@ jobs:
           --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
           --header 'accept: application/json') | jq '.status_str'
 
+          echo "Package Slug is ${{ env.SLUG }}"
           echo "Packge status is $STATUS"
