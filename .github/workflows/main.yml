@@ -61,14 +61,6 @@ jobs:
         run: |
           echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest | sed 's/^.*@//')" >> $GITHUB_ENV
 
-    #  - name: Get Image Status
-    #   id: get-slug
-    #    run: | 
-    #      echo "IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
-    #            --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
-    #            --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
-    #            --header 'accept: application/json' | jq '.[].status_str')" >> $GITHUB_ENV
-
       - name: Check Image status 
         id: check-status
         run: | 
@@ -91,7 +83,7 @@ jobs:
             if [[ $IMAGE_STATUS == '"Quarantined"' ]]; then
               echo "🚨 Image ${{ env.IMAGE_DIGEST }} is quarantined. Image was pushed but cannot be fetched."
               exit 1
-            elif [[ $IMAGE_STATUS == "Complete" ]]; then
+            elif [[ $IMAGE_STATUS == '"Complete"' ]]; then
               echo "✅ Image ${{ env.IMAGE_DIGEST }} was not quarantined."
               exit 0
             fi
