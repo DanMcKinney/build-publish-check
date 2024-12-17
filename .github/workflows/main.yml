@@ -64,15 +64,17 @@ jobs:
           echo "Image digest is ${{ env.IMAGE_DIGEST }}"
 
       - name: Get Image slug/identifier
+        id: get-slug
         run: | 
           SLUG=$(curl --request GET \
                 --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/gh-actions/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
                 --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
                 --header 'accept: application/json') | jq '.slug_perm' >> $GITHUB_ENV
 
-          echo "Package identifier is $SLUG"
+          echo $SLUG
 
       - name: Check package status 
+        id: check-status
         run: | 
           STATUS=$(curl --request GET \
           --url "https://api.cloudsmith.io/v1/packages/demo/gh-actions/${{env.SLUG}}/status/" \
