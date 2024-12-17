@@ -60,13 +60,13 @@ jobs:
       - name: Get image digest
         id: get-digest
         run: |
-          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
+          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .Id}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
 
       - name: Get Image Slug/Identifier
         id: get-slug
         run: | 
           echo "PACKAGE_IDENTIFIER=$(curl --request GET \
-                --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
+                --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/?query=docker_image_digest%3A${{env.IMAGE_DIGEST}}&sort=-date" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
                 --header 'accept: application/json' | jq '.[].slug_perm')" >> $GITHUB_ENV
 
@@ -78,5 +78,5 @@ jobs:
           --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
           --header 'accept: application/json' | jq '.status_str')
 
-          echo "Package Slug is ${{ env.SLUG }}"
+          echo "Package Slug is ${{ env.PACKAGE_IDENTIFIER }}"
           echo "Packge status is $STATUS"
