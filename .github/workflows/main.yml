@@ -66,7 +66,7 @@ jobs:
         run: | 
           echo "IMAGE_STATUS=$(curl --request GET \
                 --url https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/ \
-                --data-urlencode "docker_image_digest:${{env.IMAGE_DIGEST}}" \
+                --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
                 --header 'accept: application/json' | jq '.status.str')" >> $GITHUB_ENV
 
