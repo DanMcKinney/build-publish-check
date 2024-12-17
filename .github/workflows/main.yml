@@ -55,6 +55,9 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             CLOUDSMITH_REPO_NAME=${{ env.CLOUDSMITH_REPO_NAME }}
+            CLOUDSMITH_SERVICE=${{ env.CLOUDSMITH_SERVICE}}
+            CLOUDSMITH_API_KEY=${{ env.CLOUDSMITH_API_KEY}}
+            CLOUDSMITH_NAMESPACE=$${{ env.CLOUDSMITH_NAMESPACE}}
             
       # Step to get the image digest
       - name: Get image digest
