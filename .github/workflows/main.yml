@@ -78,24 +78,26 @@ jobs:
           echo "Image Digest is ${{ env.IMAGE_DIGEST }}"
           
           for ((i=1; i<=MAX_RETRIES; i++)); do
-          echo "🔄 Attempt $i of $MAX_RETRIES..."
-          IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
+
+            echo "🔄 Attempt $i of $MAX_RETRIES..."
+
+            IMAGE_STATUS=$(curl -s -G --url 'https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/' \
                 --data-urlencode "query=docker_image_digest:${{env.IMAGE_DIGEST}}" \
                 --header "X-Api-Key: ${{env.CLOUDSMITH_API_KEY}}" \
                 --header 'accept: application/json' | jq '.[].status_str')
 
-          echo "ℹ️ Current Status: $IMAGE_STATUS"
+            echo "ℹ️ Current Status: $IMAGE_STATUS"
+
             if [[ "$IMAGE_STATUS" == "Quarantined" ]]; then
-              echo "🚨 Image ${{ env.IMAGE_DIGEST }}  is quarantined. Build failed."
+              echo "🚨 Image ${{ env.IMAGE_DIGEST }} is quarantined. Build failed."
               exit 1
             elif [[ "$IMAGE_STATUS" == "Complete" ]]; then
               echo "✅ Image ${{ env.IMAGE_DIGEST }} was not quarantined."
               exit 0
             fi
 
-          echo "⏳ Waiting $SLEEP_TIME seconds before retrying..."
-          sleep $SLEEP_TIME
-          
+            echo "⏳ Waiting $SLEEP_TIME seconds before retrying..."
+            sleep $SLEEP_TIME
           done
 
           echo "❗ Image status did not stabilize after $MAX_RETRIES attempts."
