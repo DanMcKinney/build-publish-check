@@ -83,7 +83,7 @@ jobs:
             if [[ $IMAGE_STATUS == '"Quarantined"' ]]; then
               echo "🚨 Image ${{ env.IMAGE_DIGEST }} is quarantined. Image was pushed but cannot be fetched."
               exit 1
-            elif [[ $IMAGE_STATUS == '"Complete"' ]]; then
+            elif [[ $IMAGE_STATUS == '"Completed"' ]]; then
               echo "✅ Image ${{ env.IMAGE_DIGEST }} was not quarantined."
               exit 0
             fi
