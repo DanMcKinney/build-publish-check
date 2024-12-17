@@ -72,7 +72,7 @@ jobs:
                 --header 'accept: application/json' | jq '.[].slug_perm')
           
           echo "Package Identifier is $PACKAGE_IDENTIFIER"
-          echo "$PACKAGE_IDENTIFIER" >> $GITHUB_ENV
+          echo $PACKAGE_IDENTIFIER >> "$GITHUB_ENV"
 
       - name: Check package status 
         id: check-status
