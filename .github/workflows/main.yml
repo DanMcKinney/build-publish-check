@@ -73,7 +73,9 @@ jobs:
         id: check-status
         run: | 
           echo "Image Digest is ${{ env.IMAGE_DIGEST }}"
-          if 
-            ${{ env.IMAGE_STATUS }}"=="Quarantined"
+          if [[ "$${{ env.IMAGE_STATUS }}" == "Quarantined" ]]; then
+            echo "Error: The image status is 'Quarantined'. Exiting with failure."
             exit 1
-          fi  
+          fi
+
+          echo "Status is not 'Quarantined'. Proceeding..."
