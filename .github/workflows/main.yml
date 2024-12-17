@@ -59,7 +59,7 @@ jobs:
       - name: Get Image digest
         id: get-digest
         run: |
-          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
+          echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest | sed 's/^.*@//')" >> $GITHUB_ENV
           echo "IMAGE_DIGEST2=$(docker inspect --format='{{index .Id}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest)" >> $GITHUB_ENV
 
       - name: Get Image Status
