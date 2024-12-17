@@ -26,10 +26,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step to checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v4
-      
+        uses: actions/checkout@v4   
+  
       - name: Auth to Cloudsmith with OIDC
         uses: cloudsmith-io/cloudsmith-cli-action@v1.0.2
         with:
@@ -37,7 +36,6 @@ jobs:
           oidc-service-slug: ${{ env.CLOUDSMITH_SERVICE }}
           oidc-auth-only: 'true'
 
-      # Step to authenticate with Cloudsmith Docker Registry
       - name: Authenticate with Cloudsmith Docker Registry
         uses: docker/login-action@v2
         with:
@@ -45,7 +43,6 @@ jobs:
           username: ${{ env.CLOUDSMITH_SERVICE }}
           password: ${{ env.CLOUDSMITH_API_KEY }}
 
-      # Step to build and push the Docker image to Cloudsmith
       - name: Build and push image
         id: push
         uses: docker/build-push-action@v5.0.0
@@ -64,6 +61,7 @@ jobs:
         id: get-digest
         run: |
           echo "IMAGE_DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}):latest" >> $GITHUB_ENV
+          echo $GITHUB_ENV 
           echo "Image digest is ${{ env.IMAGE_DIGEST }}"
 
       - name: Get Image slug/identifier
