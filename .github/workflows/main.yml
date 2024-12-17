@@ -72,10 +72,26 @@ jobs:
       - name: Check Image status 
         id: check-status
         run: | 
+          MAX_RETRIES=10
+          SLEEP_TIME=20
+
           echo "Image Digest is ${{ env.IMAGE_DIGEST }}"
-          if [[ "$${{ env.IMAGE_STATUS }}" == "Quarantined" ]]; then
-            echo "Error: The image status is 'Quarantined'. Exiting with failure."
-            exit 1
+          
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+          echo "🔄 Attempt $i of $MAX_RETRIES..."
+
+          echo "ℹ️ Current Status: ${{ env.IMAGE_STATUS }}"
+              if [[ "${{ env.IMAGE_STATUS }}" == "Quarantined" ]]; then
+              echo "🚨 Image ${{ env.IMAGE_DIGEST }}  is quarantined. Build failed."
+              exit 1
           fi
 
+          echo "⏳ Waiting $SLEEP_TIME seconds before retrying..."
+          sleep $SLEEP_TIME
+
           echo "Status is not 'Quarantined'. Proceeding..."
+          
+          echo "❗ Package $IMAGE_NAME:$TAG_NAME status did not stabilize after $MAX_RETRIES attempts."
+
+          done
+
