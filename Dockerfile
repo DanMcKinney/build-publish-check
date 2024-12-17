@@ -1,6 +1,6 @@
 # Use an official Python runtime as a parent image.
 #FROM python:3.12.4-slim
-FROM docker.cloudsmith.io/ciara-demo/sbom-support/python:3.12.4-slim
+FROM docker.cloudsmith.io/demo/gh-actions/python:3.12.4-slim
 
 # Set the working directory in the container.
 WORKDIR /flask_app
@@ -9,11 +9,8 @@ WORKDIR /flask_app
 COPY flask_app/app.py /flask_app
 COPY flask_app/requirements.txt /flask_app
 
-ARG CLOUDSMITH_ENTITLEMENT_TOKEN
-ARG CLOUDSMITH_REPO_NAME
-
 # Set the PIP_INDEX_URL environment variable.
-ENV PIP_INDEX_URL=https://dl.cloudsmith.io/${CLOUDSMITH_ENTITLEMENT_TOKEN}/${CLOUDSMITH_REPO_NAME}/python/simple/
+ENV PIP_INDEX_URL=https://dl.cloudsmith.io/PmGJxnYxiH3DggVH/demo/gh-actions/python/simple/
 
 # Install any needed packages specified in requirements.txt using the Cloudsmith repository.
 RUN pip install --no-cache-dir -r requirements.txt
