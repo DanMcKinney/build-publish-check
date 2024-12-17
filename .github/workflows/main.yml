@@ -70,7 +70,7 @@ jobs:
           SLUG=$(curl --request GET \
                 --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/?query=name%3Adrone-base%20AND%20tag%3Alatest&sort=-date" \
                 --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
-                --header 'accept: application/json') | jq '.slug_perm' >> $GITHUB_ENV
+                --header 'accept: application/json' | jq '.slug_perm') >> $GITHUB_ENV
 
           echo $SLUG
 
@@ -80,7 +80,7 @@ jobs:
           STATUS=$(curl --request GET \
           --url "https://api.cloudsmith.io/v1/packages/${{env.CLOUDSMITH_NAMESPACE}}/${{env.CLOUDSMITH_REPO_NAME}}/${{env.SLUG}}/status/" \
           --header "X-Api-Key:Bearer $CLOUDSMITH_API_KEY" \
-          --header 'accept: application/json') | jq '.status_str'
+          --header 'accept: application/json' | jq '.status_str')
 
           echo "Package Slug is ${{ env.SLUG }}"
           echo "Packge status is $STATUS"
