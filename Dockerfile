@@ -15,7 +15,7 @@ ARG CLOUDSMITH_REPO_NAME
 ARG CLOUDSMITH_NAMESPACE
 
 # Set the PIP_INDEX_URL environment variable.
-ENV PIP_INDEX_URL=--https://${CLOUDSMITH_SERVICE}:${CLOUDSMITH_API_KEY}dl.cloudsmith.io/basic/${CLOUDSMITH_NAMESPACE}/${CLOUDSMITH_REPO_NAME}/simple/
+ENV PIP_INDEX_URL=--https://${CLOUDSMITH_SERVICE}:${CLOUDSMITH_API_KEY}@dl.cloudsmith.io/basic/${CLOUDSMITH_NAMESPACE}/${CLOUDSMITH_REPO_NAME}/simple/
 
 # Install any needed packages specified in requirements.txt using the Cloudsmith repository.
 RUN pip install --no-cache-dir -r requirements.txt
