@@ -85,17 +85,19 @@ jobs:
                 --header 'accept: application/json' | jq '.[].status_str')
 
           echo "ℹ️ Current Status: $IMAGE_STATUS"
-              if [[ "$IMAGE_STATUS" == "Quarantined" ]]; then
+            if [[ "$IMAGE_STATUS" == "Quarantined" ]]; then
               echo "🚨 Image ${{ env.IMAGE_DIGEST }}  is quarantined. Build failed."
               exit 1
-              fi
+            elif [[ "$IMAGE_STATUS" == "Complete" ]]; then
+              echo "✅ Image ${{ env.IMAGE_DIGEST }} was not quarantined."
+              exit 0
+            fi
 
           echo "⏳ Waiting $SLEEP_TIME seconds before retrying..."
           sleep $SLEEP_TIME
-
-          echo "Status is not 'Quarantined'. Proceeding..."
           
-          echo "❗ Package $IMAGE_NAME:$TAG_NAME status did not stabilize after $MAX_RETRIES attempts."
-
           done
+
+          echo "❗ Image status did not stabilize after $MAX_RETRIES attempts."
+          exit 1
 
