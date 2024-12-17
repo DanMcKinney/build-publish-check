@@ -85,7 +85,7 @@ jobs:
                 --header 'accept: application/json' | jq '.[].status_str')"
 
           echo "ℹ️ Current Status: $IMAGE_STATUS"
-              if [[ $IMAGE_STATUS == "Quarantined" ]]; then
+              if [[ "$IMAGE_STATUS" == "Quarantined" ]]; then
               echo "🚨 Image ${{ env.IMAGE_DIGEST }}  is quarantined. Build failed."
               exit 1
               fi
